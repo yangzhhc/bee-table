@@ -1,0 +1,136 @@
+$so-theme:        'default';
+
+$so-prefix:       'so';
+$scroll-prefix: ${so-prefix}-scroll;
+
+
+// scrollbar
+$scrollbar-width:                         16px;
+$scrollbar-bg:                            #fafafa;
+$scrollbar-color:                         rgba(0, 0, 0, 0.3);
+$scrollbar-hover-border:                  rgba(0, 0, 0, 0.1);
+$scrollbar-hover-color:                   rgba(127, 127, 127, 0.9);
+
+.${scroll-prefix} {
+  position: relative;
+  overflow: hidden;
+
+  &-inner {
+    position: relative;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  &-iframe {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 0;
+  }
+
+  &-dragging {
+    user-select: none;
+  }
+
+  &-bar {
+    position: absolute;
+    background: $scrollbar-bg;
+    border: 1px solid transparent;
+    z-index: 90;
+
+    &:hover, &.${scroll-prefix}-dragging {
+      // border-color: $scrollbar-hover-border;
+
+      .${scroll-prefix}-handle {
+        background: $scrollbar-hover-color;
+      }
+    }
+
+    .${scroll-prefix}-handle {
+      display: none;
+      cursor: default;
+      background: $scrollbar-color;
+      position: absolute;
+      border-radius: ($scrollbar-width - 4) / 2;
+      z-index: 2;
+
+      &:focus {
+        background: $scrollbar-hover-color;
+      }
+    }
+
+    &.${scroll-prefix}-y {
+      width: $scrollbar-width;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      border-width: 0 1px;
+
+      .${scroll-prefix}-handle {
+        width: $scrollbar-width - 6;
+        left: 2px;
+        min-height: 20px;
+      }
+
+      &.${scroll-prefix}-padding-y:after {
+        content: ' ';
+        position: absolute;
+        top: 100%;
+        left: -1px;
+        width: $scrollbar-width;
+        height: $scrollbar-width;
+        background: $scrollbar-bg;
+        z-index: 1;
+      }
+    }
+
+    &.${scroll-prefix}-x {
+      height: $scrollbar-width;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-width: 1px 0;
+
+      .${scroll-prefix}-handle {
+        height: $scrollbar-width - 6;
+        top: 2px;
+        min-width: 20px;
+      }
+    }
+
+    &.${scroll-prefix}-show .${scroll-prefix}-handle {
+      display: block;
+    }
+  }
+
+  &-show-x {
+    padding-bottom: $scrollbar-width;
+    .${scroll-prefix}-y {
+      bottom: $scrollbar-width;
+    }
+  }
+
+  &-show-y {
+    padding-right: $scrollbar-width;
+    .${scroll-prefix}-x {
+      right: $scrollbar-width;
+    }
+  }
+
+  &-show-x &-inner {
+    right: $scrollbar-width;
+  }
+
+  &-show-y &-inner {
+    bottom: $scrollbar-width;
+  }
+
+}

@@ -8,6 +8,7 @@ import shallowequal from 'shallowequal';
 import addEventListener from 'tinper-bee-core/lib/addEventListener';
 import ColumnManager from './ColumnManager';
 import createStore from './createStore';
+import Scroll from './components/Scroll';
 import Loading from 'bee-loading';
 import { Event,EventUtil} from "./utils";
 
@@ -1099,6 +1100,15 @@ class Table extends Component {
     }
 
     return (
+      <Scroll
+      key="body"
+      // scrollTop={scrollTop}
+      // scroll={fixed}
+      // scrollHeight={this.getContentHeight()}
+      // scrollWidth={contentWidth}
+      // onScroll={this.handleScroll}
+      // className={tableClass('body', ...floatClass)}
+    >
       <div className={className} style={props.style} ref={el => this.contentTable = el} 
       tabIndex={props.focusable && (props.tabIndex?props.tabIndex:'0')} >
         {this.getTitle()}
@@ -1123,6 +1133,7 @@ class Table extends Component {
           container={this}
           {...loading} />
       </div>
+      </Scroll>
     );
   }
 };
