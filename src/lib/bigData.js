@@ -11,10 +11,12 @@ export default function bigData(Table) {
       rowKey: "key",
       onExpand() {},
       scroll: {},
+      isTree:false,
       currentIndex:-1
     };
     static propTypes = {
-      loadBuffer: PropTypes.number
+      loadBuffer: PropTypes.number,
+      isTree:PropTypes.bool
     };
     constructor(props) {
       super(props);
@@ -79,7 +81,7 @@ export default function bigData(Table) {
      *
      */
     computeCachedRowParentIndex = data => {
-      const isTreeType = this.checkIsTreeType();
+      const isTreeType = treeType? true : this.checkIsTreeType();
       if (isTreeType) {
         data.forEach((item, index) => {
           this.firstLevelKey[index] = this.getRowKey(item, index);

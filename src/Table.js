@@ -10,7 +10,7 @@ import ColumnManager from './ColumnManager';
 import createStore from './createStore';
 import Scroll from './components/Scroll';
 import Loading from 'bee-loading';
-import { Event,EventUtil} from "./utils";
+import { Event,EventUtil,setTranslate} from "./utils";
 
 const propTypes = {
   data: PropTypes.array,
@@ -204,15 +204,16 @@ class Table extends Component {
     }
     //适应模态框中表格、以及父容器宽度变化的情况
     if (typeof (this.props.scroll.x) !== 'number' && this.contentTable.getBoundingClientRect().width !== this.contentDomWidth && this.firstDid) {
-      this.computeTableWidth();
+      // this.computeTableWidth();
       this.firstDid = false;//避免重复update
     }
-    if(this.scrollTop){
-      this.refs.fixedColumnsBodyLeft && ( this.refs.fixedColumnsBodyLeft.scrollTop = this.scrollTop);
-      this.refs.fixedColumnsBodyRight && ( this.refs.fixedColumnsBodyRight.scrollTop = this.scrollTop);
-      this.refs.bodyTable.scrollTop = this.scrollTop;
-      this.scrollTop = 0;
-    }
+    //todo
+    // if(this.scrollTop){
+    //   this.refs.fixedColumnsBodyLeft && ( this.refs.fixedColumnsBodyLeft.scrollTop = this.scrollTop);
+    //   this.refs.fixedColumnsBodyRight && ( this.refs.fixedColumnsBodyRight.scrollTop = this.scrollTop);
+    //   this.refs.bodyTable.scrollTop = this.scrollTop;
+    //   this.scrollTop = 0;
+    // }
 
 
   }
@@ -841,7 +842,19 @@ class Table extends Component {
         </div>
       );
     }
+    const contentWidth = this.getContentWidth();
+    const contentHeight = this.getContentHeight();
+    console.log(contentWidth,contentHeight);
     let BodyTable = (
+      <Scroll
+      key="body"
+      // scrollTop={scrollTop}
+      // scroll={fixed}
+      scrollHeight={contentHeight}
+      scrollWidth={contentWidth}
+      onScroll={this.handleScroll}
+      // className={tableClass('body', ...floatClass)}
+    >
       <div
         className={`${clsPrefix}-body`}
         style={bodyStyle}
@@ -853,6 +866,7 @@ class Table extends Component {
         {this.renderDragHideTable()}
         {renderTable(!useFixedHeader)}
       </div>
+      </Scroll>
     );
 
     if (fixed && columns.length) {
@@ -864,7 +878,9 @@ class Table extends Component {
       }
       delete bodyStyle.overflowX;
       delete bodyStyle.overflowY;
+     
       BodyTable = (
+      
         <div
           className={`${clsPrefix}-body-outer`}
           style={{ ...bodyStyle }}
@@ -880,6 +896,7 @@ class Table extends Component {
             {renderTable(!useFixedHeader)}
           </div>
         </div>
+      
       );
     }
     const leftFixedWidth = this.columnManager.getLeftColumnsWidth(this.contentWidth);
@@ -1070,6 +1087,135 @@ class Table extends Component {
     this.props.onTableKeyDown&&this.props.onTableKeyDown();
   }
 
+  getContentHeight() {
+    const bodyTable = this.refs.bodyTable;
+    if (!this.props.data) return 0
+    let contentHeight =  0 ;
+    const contentTable  = bodyTable && bodyTable.getElementsByTagName('table')[0];
+    if(contentTable){
+      contentHeight = contentTable.offsetHeight;
+    }
+    return contentHeight;
+    // bodyTable && bodyTable.getElementsByTagName('table')[0].offsetHeight
+    // const {scroll} = this.props;
+    // if(scroll && scroll.y ){
+    //   // todo 考虑百分比情况
+    //   return parseInt(scroll.y);
+    // }
+  }
+
+  getContentWidth() {
+    const {scroll} = this.props;
+    if (scroll && scroll.x) return parseInt(scroll.x);
+    if (this.refs.bodyTable) return this.refs.bodyTable.offsetWidth
+    return 0
+  }
+
+  resetWidth(left, right) {
+    // setTranslate(this.tbody, `-${left}px`, `-${this.lastScrollTop}px`)
+    // setTranslate(this.thead, `-${left}px`, '0');
+
+    // [this.thead, this.tbody].forEach((el) => {
+    //   [].forEach.call(
+    //     el.parentNode.querySelectorAll(`.${tableClass(CLASS_FIXED_LEFT)}`),
+    //     (td) => { setTranslate(td, `${left}px`, '0') },
+    //   )
+    // });
+
+    // [this.thead, this.tbody].forEach((el) => {
+    //   [].forEach.call(
+    //     el.parentNode.querySelectorAll(`.${tableClass(CLASS_FIXED_RIGHT)}`),
+    //     (td) => { setTranslate(td, `-${right}px`, '0') },
+    //   )
+    // })
+  }
+
+  handleScroll = (x, y, max, bar, v, h, pixelX, pixelY) => {
+    if (!this.refs.bodyTable) return
+
+    const { data, rowHeight, rowsInView } = this.props
+    const contentWidth = this.getContentWidth()
+    const contentHeight = this.getContentHeight()
+    let left = x * (contentWidth - v)
+    let scrollTop = h > contentHeight ? 0 : y
+    console.log(left,scrollTop);
+    let right = max - left
+    if (right < 0) right = 0
+
+    /* set x */
+    if (left < 0) left = 0
+    this.resetWidth(left, right)
+    /* set x end */
+
+    // /* set y */
+    // this.tbody.style.marginTop = `${scrollTop * h}px`
+
+    if (pixelY === undefined) {
+      // drag scroll bar
+
+      // const index = this.getIndex(scrollTop)
+      // const lastRowHeight = this.getLastRowHeight(index)
+      // const offsetScrollTop = this.getSumHeight(0, index)
+      // + (scrollTop * this.realTbody.clientHeight)
+
+      // this.setState({ currentIndex: index })
+      // this.lastScrollTop = offsetScrollTop
+      // setTranslate(this.tbody, `-${left}px`, `-${offsetScrollTop + lastRowHeight}px`)
+      setTranslate(this.refs.bodyTable, `-${left}px`, `-${scrollTop}px`)
+      this.refs.headTable && setTranslate(this.refs.headTable, `-${left}px`,  '0px')
+    } else if (pixelY === 0) {
+      // whell x
+      setTranslate(this.refs.bodyTable, `-${left}px`, `-${scrollTop}px`)
+      this.refs.headTable && setTranslate(this.refs.headTable, `-${left}px`,  '0px')
+      // setTranslate(this.tbody, `-${left}px`, `-${this.lastScrollTop}px`)
+    } else if (contentHeight < h) {
+      this.lastScrollTop = 0
+      scrollTop = 0
+      setTranslate(this.refs.bodyTable, `-${left}px`, '0px')
+      this.refs.headTable && setTranslate(this.refs.headTable, `-${left}px`,  '0px')
+      // this.setState({ currentIndex: 0 })
+    } else {
+      // wheel scroll
+
+      // this.lastScrollTop += pixelY
+      // if (this.lastScrollTop < 0) this.lastScrollTop = 0
+
+
+      // // scroll over bottom
+      // if (this.lastScrollTop > contentHeight) this.lastScrollTop = contentHeight
+
+      // let temp = this.lastScrollTop - (scrollTop * h)
+      // let index = 0
+      // while (temp > 0) {
+      //   temp -= this.cachedRowHeight[index] || rowHeight
+      //   index += 1
+      // }
+
+      // // offset last row
+      // index -= 1
+
+      // if (data.length - rowsInView < index) index = data.length - rowsInView
+      // if (index < 0) index = 0
+
+      // this.setState({ currentIndex: index })
+
+      // scrollTop = this.lastScrollTop / contentHeight
+      setTranslate(this.refs.bodyTable, `-${left}px`, `-${scrollTop}px`)
+      this.refs.headTable && setTranslate(this.refs.headTable, `-${left}px`,  '0px')
+    }
+    /* set y end */
+
+    // this.setState({
+    //   scrollLeft: x,
+    //   scrollTop,
+    //   offsetLeft: left,
+    //   offsetRight: right,
+    // })
+
+    // if (this.props.onScroll) this.props.onScroll(x, y)
+  }
+
+
   render() {
     const props = this.props;
     const clsPrefix = props.clsPrefix;
@@ -1098,17 +1244,9 @@ class Table extends Component {
         show: loading,
       };
     }
-
+  
     return (
-      <Scroll
-      key="body"
-      // scrollTop={scrollTop}
-      // scroll={fixed}
-      // scrollHeight={this.getContentHeight()}
-      // scrollWidth={contentWidth}
-      // onScroll={this.handleScroll}
-      // className={tableClass('body', ...floatClass)}
-    >
+    
       <div className={className} style={props.style} ref={el => this.contentTable = el} 
       tabIndex={props.focusable && (props.tabIndex?props.tabIndex:'0')} >
         {this.getTitle()}
@@ -1133,7 +1271,7 @@ class Table extends Component {
           container={this}
           {...loading} />
       </div>
-      </Scroll>
+     
     );
   }
 };

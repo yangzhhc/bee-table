@@ -192,6 +192,7 @@ class Demo2 extends React.Component {
         <Table
           data={dataSource}
           columns={columns}
+          scroll={{x:1800,y:100}}
           getBodyWrapper={this.getBodyWrapper}
         />
       </div>

@@ -8414,6 +8414,91 @@ ul {
   100% {
     transform: scaley(1); } }
 
+.so-scroll {
+  position: relative;
+  overflow: hidden; }
+  .so-scroll-inner {
+    position: relative;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    z-index: 10; }
+  .so-scroll-iframe {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 0; }
+  .so-scroll-dragging {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; }
+  .so-scroll-bar {
+    position: absolute;
+    background: #fafafa;
+    border: 1px solid transparent;
+    z-index: 90; }
+    .so-scroll-bar:hover .so-scroll-handle, .so-scroll-bar.so-scroll-dragging .so-scroll-handle {
+      background: rgba(127, 127, 127, 0.9); }
+    .so-scroll-bar .so-scroll-handle {
+      display: none;
+      cursor: default;
+      background: rgba(0, 0, 0, 0.3);
+      position: absolute;
+      border-radius: 6px;
+      z-index: 2; }
+      .so-scroll-bar .so-scroll-handle:focus {
+        background: rgba(127, 127, 127, 0.9); }
+    .so-scroll-bar.so-scroll-y {
+      width: 16px;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      border-width: 0 1px; }
+      .so-scroll-bar.so-scroll-y .so-scroll-handle {
+        width: 10px;
+        left: 2px;
+        min-height: 20px; }
+      .so-scroll-bar.so-scroll-y.so-scroll-padding-y:after {
+        content: ' ';
+        position: absolute;
+        top: 100%;
+        left: -1px;
+        width: 16px;
+        height: 16px;
+        background: #fafafa;
+        z-index: 1; }
+    .so-scroll-bar.so-scroll-x {
+      height: 16px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-width: 1px 0; }
+      .so-scroll-bar.so-scroll-x .so-scroll-handle {
+        height: 10px;
+        top: 2px;
+        min-width: 20px; }
+    .so-scroll-bar.so-scroll-show .so-scroll-handle {
+      display: block; }
+  .so-scroll-show-x {
+    padding-bottom: 16px; }
+    .so-scroll-show-x .so-scroll-y {
+      bottom: 16px; }
+  .so-scroll-show-y {
+    padding-right: 16px; }
+    .so-scroll-show-y .so-scroll-x {
+      right: 16px; }
+  .so-scroll-show-x .so-scroll-inner {
+    right: 16px; }
+  .so-scroll-show-y .so-scroll-inner {
+    bottom: 16px; }
+
 .u-table {
   font-size: 12px;
   color: #666;
@@ -10328,18 +10413,5 @@ li.rc-time-picker-panel-select-option-disabled:hover {
   height: 100%; }
   .demo25 .u-table-filter-column-filter-icon {
     right: 15px; }
-
-th .drop-menu .uf {
-  font-size: 12px;
-  visibility: hidden;
-  margin-left: 15px; }
-
-th:hover .uf {
-  visibility: visible; }
-
-.demo3 .u-table-thead th {
-  padding-top: 0px;
-  padding-bottom: 0px; }
-
 
 /*# sourceMappingURL=demo.css.map */

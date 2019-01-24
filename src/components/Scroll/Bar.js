@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import "./scroll.less"
+// import "./Scroll.scss"
 import fixedLength from './fixedLength'
+const prefix = 'so-scroll-'
 
 class ScrollBar extends PureComponent {
   constructor(props) {
@@ -26,7 +27,7 @@ class ScrollBar extends PureComponent {
   toggleClassList(method) {
     const { classList } = this.handle.parentNode.parentNode
     if (classList) {
-      classList[method](scrollClass('dragging'))
+      classList[method]('so-dragging')
     }
   }
 
@@ -103,13 +104,12 @@ class ScrollBar extends PureComponent {
     const { dragging } = this.state
     const show = scrollLength > length
     const className = classnames(
-      scrollClass(
-        'bar',
-        direction,
-        show && 'show',
-        dragging && 'dragging',
-        !forceHeight && 'padding-y',
-      ),
+     
+        `${prefix}bar`,
+        `${prefix}${direction}`,
+        show && `${prefix}show`,
+        dragging && `${prefix}dragging`,
+        !forceHeight && `${prefix}padding-y`,
       this.props.className,
     )
 
@@ -133,7 +133,7 @@ class ScrollBar extends PureComponent {
         onMouseDown={show ? this.handleBgClick : undefined}
       >
         <div
-          className={scrollClass('handle')}
+          className={`${prefix}handle`}
           onMouseDown={this.handleBarClick}
           ref={this.bindHandle}
           style={style}

@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-// import { getProps, defaultProps } from '../utils/proptypes'
+import { getProps, defaultProps } from './utils/proptypes'
 import { getParent } from './utils/dom/element'
 import normalizeWheel from './utils/dom/normalizeWheel'
-import './scroll.less';
+// import './Scroll.scss';
 import Bar from './Bar'
 import { Provider } from './context'
-
+const prefix = 'so-scroll-'
 const BAR_WIDTH = 12
 
 class Scroll extends PureComponent {
@@ -131,7 +131,7 @@ class Scroll extends PureComponent {
     const { scrollX, scrollY } = this.props
     if (!scrollX && !scrollY) return
 
-    const target = getParent(event.target, `.${scrollClass('_')}`)
+    const target = getParent(event.target, `.so-scroll`)
     if (target !== this.wheelElement) return
 
     const wheel = normalizeWheel(event)
@@ -173,19 +173,18 @@ class Scroll extends PureComponent {
     const { width, height } = this.getWheelRect()
 
     const className = classnames(
-      scrollClass(
-        '_',
-        scrollX && 'show-x',
-        scrollY && 'show-y',
-      ),
+     
+        'so-scroll',
+        scrollX && `${prefix}show-x`,
+        scrollY && `${prefix}show-y`,
       this.props.className,
     )
 
     return (
       <div onWheel={this.handleWheel} style={style} ref={this.bindWheel} className={className}>
-        <iframe title="scroll" ref={this.bindIframe} className={scrollClass('iframe')} />
-        <div className={scrollClass('iframe')} />
-        <div ref={this.bindInner} className={scrollClass('inner')}>
+        <iframe title="scroll" ref={this.bindIframe} className={`${prefix}iframe`} />
+        <div className={`${prefix}iframe`} />
+        <div ref={this.bindInner} className={`${prefix}inner`}>
           <Provider value={{ left: left * width, top: top * height, element: this.wheelElement }}>
             { children }
           </Provider>
@@ -217,7 +216,7 @@ class Scroll extends PureComponent {
 }
 
 Scroll.propTypes = {
-  // ...getProps(PropTypes),
+  ...getProps(PropTypes),
   left: PropTypes.number.isRequired,
   // overLock: PropTypes.bool,
   top: PropTypes.number.isRequired,
@@ -229,7 +228,7 @@ Scroll.propTypes = {
 }
 
 Scroll.defaultProps = {
-  // ...defaultProps,
+  ...defaultProps,
   // overLock: true,
   scrollHeight: 0,
   scrollWidth: 0,
