@@ -183,6 +183,12 @@
     background: rgb(227,242,253); }
     .u-table tr:hover td .uf-eye {
       visibility: visible !important; }
+  .u-table tr tr a {
+    color: rgb(30,136,229); }
+    .u-table tr tr a:hover {
+      color: rgb(66,165,245); }
+    .u-table tr tr a:active {
+      color: rgb(21,101,192); }
   .u-table tr.tr-row-hover {
     background: rgb(227,242,253); }
   .u-table th,
@@ -197,7 +203,7 @@
     .u-table tr.filterable th .filterContext {
       height: 35px; }
   .u-table-row-hover {
-    background: #e3f2fd; }
+    background: rgb(227,242,253); }
   .u-table-scroll {
     overflow: auto; }
   .u-table-bordered table {
@@ -213,7 +219,8 @@
     box-sizing: border-box; }
   .u-table-header {
     overflow: hidden;
-    background: #f7f7f7; }
+    background: #f7f7f7;
+    color: #666; }
   .u-table.fixed-height td {
     padding: 0px 8px; }
   .u-table-fixed-header .u-table-body {
@@ -273,6 +280,8 @@
     content: "-"; }
   .u-table-row-collapsed:after, .u-table-expanded-row-collapsed:after {
     content: "+"; }
+  .u-table-row.selected {
+    background: rgb(227,242,253); }
   .u-table tr.u-table-expanded-row {
     background: #f7f7f7; }
     .u-table tr.u-table-expanded-row:hover {
@@ -334,6 +343,7 @@
       min-width: 58px; }
   .u-table-thead th {
     background: #f7f7f7;
+    color: #666;
     background-clip: padding-box;
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
@@ -385,7 +395,7 @@
   .u-table-thead .th-drag {
     cursor: move; }
   .u-table-thead .th-drag:hover {
-    background: #e3f2fd; }
+    background: rgb(227,242,253); }
   .u-table-thead .th-drag-hover {
     background: #ccc; }
   .u-table-thead-th {
