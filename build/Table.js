@@ -283,13 +283,16 @@ var Table = function (_Component) {
       this.columnManager.reset(null, nextProps.children);
     }
     //适配lazyload
-    if (nextProps.scrollTop) {
+    if (nextProps.scrollTop > -1) {
       // this.refs.bodyTable.scrollTop = nextProps.scrollTop;
       this.scrollTop = nextProps.scrollTop;
     }
     if (!nextProps.originWidth) {
       this.computeTableWidth();
       this.firstDid = true; //避免重复update
+    }
+    if (nextProps.resetScroll) {
+      this.resetScrollY();
     }
 
     // console.log('this.scrollTop**********',this.scrollTop);
@@ -305,11 +308,11 @@ var Table = function (_Component) {
       this.computeTableWidth();
       this.firstDid = false; //避免重复update
     }
-    if (this.scrollTop) {
+    if (this.scrollTop > -1) {
       this.refs.fixedColumnsBodyLeft && (this.refs.fixedColumnsBodyLeft.scrollTop = this.scrollTop);
       this.refs.fixedColumnsBodyRight && (this.refs.fixedColumnsBodyRight.scrollTop = this.scrollTop);
       this.refs.bodyTable.scrollTop = this.scrollTop;
-      this.scrollTop = 0;
+      this.scrollTop = -1;
     }
   };
 
@@ -432,7 +435,8 @@ var Table = function (_Component) {
         headerHeight = _props.headerHeight,
         afterDragColWidth = _props.afterDragColWidth,
         headerScroll = _props.headerScroll,
-        bordered = _props.bordered;
+        bordered = _props.bordered,
+        onDropBorder = _props.onDropBorder;
 
     var rows = this.getHeaderRows(columns);
     if (expandIconAsCell && fixed !== 'right') {
@@ -446,7 +450,7 @@ var Table = function (_Component) {
 
     var trStyle = headerHeight && !fixed ? { height: headerHeight } : fixed ? this.getHeaderRowStyle(columns, rows) : null;
     var drop = draggable ? { onDragStart: onDragStart, onDragOver: onDragOver, onDrop: onDrop, onDragEnter: onDragEnter, draggable: draggable } : {};
-    var dragBorder = dragborder ? { onMouseDown: onMouseDown, onMouseMove: onMouseMove, onMouseUp: onMouseUp, dragborder: dragborder, onThMouseMove: onThMouseMove, dragborderKey: dragborderKey } : {};
+    var dragBorder = dragborder ? { onMouseDown: onMouseDown, onMouseMove: onMouseMove, onMouseUp: onMouseUp, dragborder: dragborder, onThMouseMove: onThMouseMove, dragborderKey: dragborderKey, onDropBorder: onDropBorder } : {};
     var contentWidthDiff = 0;
     //非固定表格,宽度不够时自动扩充
     if (!fixed) {
@@ -817,7 +821,7 @@ var Table = function (_Component) {
     }));
     return _react2["default"].createElement(
       'colgroup',
-      null,
+      { id: 'bee-table-colgroup' },
       cols
     );
   };
@@ -905,7 +909,8 @@ var Table = function (_Component) {
         } else {
           if (fixed) {
             if (this.domWidthDiff > 0) {
-              innerBodyStyle.overflowX = 'auto';
+              headStyle.overflow = 'hidden';
+              innerBodyStyle.overflowX = 'auto'; //兼容expand场景、子表格含有固定列的场景
             } else {
               bodyStyle.marginBottom = '-' + scrollbarWidth + 'px';
             }
@@ -941,7 +946,7 @@ var Table = function (_Component) {
       var _drag_class = _this4.props.dragborder ? "table-drag-bordered" : "";
       return _react2["default"].createElement(
         'table',
-        { className: ' ' + tableClassName + '  table-bordered ' + _drag_class + ' ', style: tableStyle },
+        { id: 'bee-table-uid', className: ' ' + tableClassName + '  table-bordered ' + _drag_class + ' ', style: tableStyle },
         _this4.getColGroup(columns, fixed),
         hasHead ? _this4.getHeader(columns, fixed) : null,
         tableBody
