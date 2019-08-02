@@ -8,6 +8,8 @@ const propTypes = {
     expandable: PropTypes.any,
     expanded: PropTypes.bool,
     needIndentSpaced: PropTypes.bool,
+    
+    fixedIndex:PropTypes.number,
     onExpand: PropTypes.func,
 };
 
@@ -30,7 +32,7 @@ class ExpandIcon extends Component{
       }else if(!expanded && collapsedIcon){
         currentIcon = collapsedIcon;
       }
-      return (<span onClick={(e) => onExpand(!expanded, record, e)} className='expand-icon-con'>{currentIcon}</span>);
+      return (<span onClick={(e) => onExpand(!expanded, record, this.props.fixedIndex)} className='expand-icon-con'>{currentIcon}</span>);
     } else if (needIndentSpaced || isHiddenExpandIcon) {
       return <span className={`${clsPrefix}-expand-icon ${clsPrefix}-spaced`} />;
     }

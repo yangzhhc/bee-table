@@ -123,6 +123,7 @@ class Table extends Component {
       scrollPosition: 'left',
       fixedColumnsHeadRowsHeight: [],
       fixedColumnsBodyRowsHeight: [],
+      fixedIndex:undefined,    //平铺之后的index
     }
 
     this.onExpandedRowsChange = this.onExpandedRowsChange.bind(this);
@@ -632,7 +633,7 @@ class Table extends Component {
    * @returns
    * @memberof Table
    */
-  getRowsByData(data, visible, indent, columns, fixed,rootIndex=-1) {
+  getRowsByData(data, visible, indent, columns, fixed,rootIndex=-1) {   //用state中的data来渲染表格
     const props = this.props;
     const childrenColumnName = props.childrenColumnName;
     const expandedRowRender = props.expandedRowRender;
@@ -651,9 +652,9 @@ class Table extends Component {
     const expandIconAsCell = fixed !== 'right' ? props.expandIconAsCell : false;
     const expandIconColumnIndex = fixed !== 'right' ? props.expandIconColumnIndex : -1;
     if(props.lazyLoad && props.lazyLoad.preHeight && indent == 0){
-      rst.push(
-        <TableRow height={props.lazyLoad.preHeight} columns={[]} className='' key={'table_row_first'} store={this.store} visible = {true}/>
-      )
+        rst.push(
+          <TableRow height={props.lazyLoad.preHeight} columns={[]} className='' key={'table_row_first'} store={this.store} visible = {true}/>
+        )
     }
     const lazyCurrentIndex =  props.lazyLoad && props.lazyLoad.startIndex ?props.lazyLoad.startIndex :0;
     const lazyParentIndex = props.lazyLoad && props.lazyLoad.startParentIndex ?props.lazyLoad.startParentIndex :0;
@@ -670,7 +671,7 @@ class Table extends Component {
         let fixedIndex = i;
         //判断是否是tree结构
         if (this.treeType) {
-          fixedIndex = this.treeRowIndex;
+          this.state.fixedIndex = fixedIndex = this.treeRowIndex;
         }
       if (expandedRowRender && isRowExpanded) {
         expandedRowContent = expandedRowRender(record, fixedIndex+lazyCurrentIndex, indent);
@@ -728,6 +729,7 @@ class Table extends Component {
           expandIconAsCell={expandIconAsCell}
           onDestroy={this.onRowDestroy}
           index={index}
+          fixedIndex={this.state.fixedIndex}
           visible={visible}
           expandRowByClick={expandRowByClick}
           onExpand={this.onExpanded}
@@ -1212,7 +1214,6 @@ class Table extends Component {
         300)
       }
     }
-    // console.log('lastScrollTop--'+this.lastScrollTop+'--eventScrollTop--'+ e.target.scrollTop);
     if (scroll.y && this.lastScrollTop != e.target.scrollTop && e.target !== headTable) {
       if (fixedColumnsBodyLeft && e.target !== fixedColumnsBodyLeft) {
         fixedColumnsBodyLeft.scrollTop = e.target.scrollTop;

@@ -19,6 +19,7 @@ const propTypes = {
     ]),
     visible: PropTypes.bool,
     index: PropTypes.number,
+    fixedIndex:PropTypes.number,
     hoverKey: PropTypes.any,
     expanded: PropTypes.bool,
     expandable: PropTypes.any,
@@ -446,6 +447,8 @@ class TableRow extends Component{
       <ExpandIcon
         expandable={expandable}
         clsPrefix={clsPrefix}
+       
+        fixedIndex={this.props.fixedIndex}
         onExpand={onExpand}
         needIndentSpaced={needIndentSpaced}
         expanded={expanded}

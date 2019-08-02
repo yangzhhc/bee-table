@@ -21,7 +21,11 @@ export default function bigData(Table) {
       super(props);
       this.state = {
         scrollLeft: 0,
-        scrollTop: 0
+        scrollTop: 0,
+       
+        parentNumUponBuffer:0,
+        cacheExpandIndex:[],//保存所有当前被展开的父节点的index
+       
       };
       const rowHeight = this.props.height ? this.props.height : defaultHeight;
       //默认显示25条，rowsInView根据定高算的。在非固定高下，这个只是一个大概的值。
@@ -129,7 +133,7 @@ export default function bigData(Table) {
       //重新设定scrollTop值
       _this.scrollTop = _this.getSumHeight(0, _this.startIndex);
       }
-     
+
     }
 
     getRowKey(record, index) {
@@ -251,7 +255,7 @@ export default function bigData(Table) {
           }
         }
         temp -= currentRowHeight;
-        if (temp > 0) {
+        if (temp > 0 && _this.state.cacheExpandIndex.indexOf(_this.cachedRowParentIndex[index]) !== -1) {
           index += 1;
         }
       }
@@ -260,6 +264,7 @@ export default function bigData(Table) {
       if (index < 0) index = 0;
       //如果之前的索引和下一次的不一样则重置索引和滚动的位置
       if (currentIndex !== index) {
+        console.log('index:'+index)
         _this.currentIndex = index;
         let rowsInView = 0; //可视区域显示多少行
         let rowsHeight = 0; //可视区域内容高度
@@ -284,7 +289,7 @@ export default function bigData(Table) {
             }
             tempIndex++;
           }
-          if (treeType) {
+          if (treeType&&this.cachedRowHeight[index]==0) {
             const treeIndex = index;
             index = _this.cachedRowParentIndex[treeIndex];
             if (index === undefined) {
@@ -296,13 +301,17 @@ export default function bigData(Table) {
           // console.log('parentIndex*********',index);
           // 如果rowsInView 小于 缓存的数据则重新render
           // 向下滚动 下临界值超出缓存的endIndex则重新渲染
+          console.log('rowsInView:'+rowsInView+'  index:'+index)
+          console.log('rowsInView + index:'+(rowsInView + index)+'  endIndex - rowDiff:'+(endIndex - rowDiff))
           if (rowsInView + index > endIndex - rowDiff && isOrder) {
+            console.log('向下滚loadCount:'+loadCount+'  loadBuffer:'+loadBuffer)
             startIndex = index - loadBuffer > 0 ? index - loadBuffer : 0;
             // endIndex = startIndex + rowsInView + loadBuffer*2;
             endIndex = startIndex + loadCount;
-            if (endIndex > data.length) {
+           /* if (endIndex > data.length) {
               endIndex = data.length;
-            }
+            }*/
+            console.log('endIndex:'+endIndex+'  this.endIndex:'+this.endIndex)
             if (endIndex > this.endIndex ) {
               this.startIndex = startIndex;
               this.endIndex = endIndex;
@@ -315,9 +324,11 @@ export default function bigData(Table) {
             if (startIndex < 0) {
               startIndex = 0;
             }
+            console.log('向上滚 startIndex:'+startIndex+' this.startIndex:'+this.startIndex)
             if (startIndex < this.startIndex) {
               this.startIndex = startIndex;
               this.endIndex = this.startIndex + loadCount;
+              console.log('重新渲染 startIndex:'+this.startIndex+' endIndex'+this.endIndex)
               this.setState({ needRender: !needRender });
             }
             // console.log(
@@ -367,19 +378,39 @@ export default function bigData(Table) {
 
     onExpand = (expandState, record,index) => {
       const _this = this;
+/*
+      if(!record.isExpanded){       //展开就保存该父节点index
+        console.log('关闭节点')
+        // record.isExpanded = false
+        this.state.cacheExpandIndex.splice(this.state.cacheExpandIndex.indexOf(index),1)
+      }else {                      //关闭就删除该父节点index
+        console.log(' 添加isExpanded字段')
+        // record.isExpanded = true
+        console.log('record'+JSON.stringify(record))
+        console.log('添加isExpanded字段后this.props.data:'+JSON.stringify(this.props.data))
+        console.log(JSON.stringify(record))
+        this.state.cacheExpandIndex.push(index)
+      }
+*/
+
       let {expandedRowKeys = []} =  _this;
       const {needRender} = _this.state;
       const rowKey = _this.getRowKey(record, index);
       // 记录展开子表行的key
       // 展开
+
       if( record.children){
         if (expandState) {
+          console.log('展开')
+          this.state.cacheExpandIndex.push(index)
             record.children.forEach((item, index) => {
               _this.expandChildRowKeys.push(rowKey);
             });
-  
+
         } else {
           // 收起
+          console.log('收起')
+          this.state.cacheExpandIndex.splice(this.state.cacheExpandIndex.indexOf(index),1)
             record.children.forEach((item, index) => {
               _this.expandChildRowKeys.splice(
                 _this.expandChildRowKeys.findIndex(
@@ -413,8 +444,49 @@ export default function bigData(Table) {
     // expandState为true时，记录下
       _this.props.onExpand(expandState, record);
     };
+    sliceData = (obj,array,startIndex,endIndex) =>{
+      var self = this
+      var indexCount = -1    //当前数到的节点，从最顶部的节点为0开始数，只数根节点和展开的子节点
+      var tiledIndex = -1    //当前数到的节点，从最顶部的节点为0开始数，包括所有节点
+      this.state.parentNumUponBuffer = 0   //上缓冲区上部的父节点个数,需要设置高度preheight，让其不显示在缓冲区。
+      ;(function traverse(obj,parent,array,startIndex,endIndex) {
+          for (var a in obj) {
+            if(parent.isExpanded) indexCount++
+            tiledIndex++
+            if(indexCount === endIndex) return
+            if(indexCount>=startIndex){
+              var a1 = JSON.parse(JSON.stringify(obj[a]))
+              delete a1.children
+              array.push(a1)
+              if (typeof (obj[a]) == "object" && obj[a].children) {
+                // if(obj[a].isExpanded){
+                if(self.state.cacheExpandIndex.indexOf(tiledIndex) !== -1){
+                  // self.expandedRowKeys.push(obj[a].key)
+                }
+                // }
+                obj[a].children&&traverse(obj[a].children,obj[a],array[array.length-1].children = [],startIndex,endIndex); //递归遍历
+              } else {
 
-    
+              }
+            }else {
+              if ((typeof (obj[a]) == "object") && self.state.cacheExpandIndex.indexOf(tiledIndex) !== -1) {
+                self.state.parentNumUponBuffer++
+                var a1 = JSON.parse(JSON.stringify(obj[a]))
+                delete a1.children
+                array.push(a1)
+                // debugger
+                // obj[a].children&&traverse(obj[a].children,array[a].children = [],startIndex,endIndex); //递归遍历
+              }
+            }
+            
+          }
+        }
+      ).call(this,obj,{isExpanded:true},array,startIndex,endIndex)
+      this.state.parentNumUponBuffer
+
+    }
+
+
     render() {
       const { data } = this.props;
       const { scrollTop } = this;
@@ -441,7 +513,7 @@ export default function bigData(Table) {
         const sufSubCounts = this.cachedRowParentIndex.findIndex(item => {
           return item == endIndex;
         });
-        lazyLoad.preHeight = this.getSumHeight(
+        lazyLoad.preHeight = this.getSumHeight(     //从浏览器最顶部到缓冲区上边缘的高度
           0,
           preSubCounts > -1 ? preSubCounts : 0
         );
@@ -459,11 +531,20 @@ export default function bigData(Table) {
         lazyLoad.preHeight = this.getSumHeight(0, startIndex);
         lazyLoad.sufHeight = this.getSumHeight(endIndex, data.length);
       }
-      // console.log('*******expandedRowKeys*****'+expandedRowKeys);
+      var self = this
+      var slicedData = []   //最终传给<Table/>组件的表格数据
+      //先清除掉上一次缓冲区上部父节点展位高度
+      // lazyLoad.preHeight+=this.state.parentNumUponBuffer*(this.props.height ? this.props.height : defaultHeight)
+      this.sliceData(data,slicedData,startIndex,endIndex)
+      lazyLoad.preHeight-=this.state.parentNumUponBuffer*(this.props.height ? this.props.height : defaultHeight)
+      /*console.log('this.state.parentNumUponBuffer*(this.props.height ? this.props.height : defaultHeight):'+this.state.parentNumUponBuffer*(this.props.height ? this.props.height : defaultHeight))*/
+      console.log('lazyLoad:'+JSON.stringify(lazyLoad))
+      console.log('expandedRowKeys:'+JSON.stringify(expandedRowKeys))
+      console.log('slicedData:'+JSON.stringify(slicedData))
       return (
         <Table
           {...this.props}
-          data={data.slice(startIndex, endIndex)}
+          data={slicedData}
           lazyLoad={lazyLoad}
           handleScrollY={this.handleScrollY}
           scrollTop={scrollTop}
