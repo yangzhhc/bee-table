@@ -115,6 +115,14 @@ class TableCell extends Component{
     return moment(data).format(format || 'YYYY-MM-DD');
   }
 
+  // 渲染下拉类型，主要为编辑表格铺垫
+  renderSelect = ( data, config={}) => {
+    if(config.options){
+      data = config.options[data] || config.defaultShow;
+    }
+    return data;
+  }
+
   render() {
     const { record, indentSize, clsPrefix, indent,
             index, expandIcon, column ,fixed,showSum, bodyDisplayInRow,lazyStartIndex,lazyEndIndex} = this.props;
@@ -171,6 +179,10 @@ class TableCell extends Component{
         }
         case 'date':{
           text = this.renderDate(text, column.dateConfig);
+          break;
+        }
+        case 'select':{
+          text = this.renderSelect(text, column.selectConfig);
           break;
         }
         default : {
