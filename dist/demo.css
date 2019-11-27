@@ -1128,6 +1128,9 @@ th:hover .uf {
 .expanded-table .expand-icon-con .uf {
   font-size: 12px; }
 
+.u-table td .u-switch-span {
+  height: 12px; }
+
 
 .demo8 .u-table {
   margin-bottom: 11px; }

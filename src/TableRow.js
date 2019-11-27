@@ -324,24 +324,30 @@ class TableRow extends Component{
   }
 
   onDragEnter = (e) => {
+    let { onDragRowEnter } = this.props;
     let event = Event.getEvent(e) ,
-    _target = Event.getTarget(event),target = _target.parentNode;
-    let currentIndex = target.getAttribute("data-row-key");
+        _target = Event.getTarget(event),
+        target = _target.parentNode;
+        let currentIndex = target.getAttribute("data-row-key");
     if(!currentIndex || currentIndex === this.currentIndex)return;
     if(target.nodeName.toUpperCase() === "TR"){
+      console.log('enter', currentIndex)
       this.synchronizeTableTr(currentIndex,true);
-      // target.setAttribute("style","border-bottom:2px dashed rgba(5,0,0,0.25)");
-      // // target.style.backgroundColor = 'rgb(235, 236, 240)';
+      onDragRowEnter && onDragRowEnter(currentIndex);
     }
   }
 
   onDragLeave = (e) => {
+    let { onDragRowLeave } = this.props;
     let event = Event.getEvent(e) ,
-    _target = Event.getTarget(event),target = _target.parentNode;
-    let currentIndex = target.getAttribute("data-row-key");
+        _target = Event.getTarget(event),
+        target = _target.parentNode;
+        let currentIndex = target.getAttribute("data-row-key");
     if(!currentIndex || currentIndex === this.currentIndex)return;
     if(target.nodeName.toUpperCase() === "TR"){
+      console.log('leave', currentIndex)
       this.synchronizeTableTr(currentIndex,null);
+      onDragRowLeave && onDragRowLeave(currentIndex);
     }
   }
 
@@ -449,7 +455,7 @@ class TableRow extends Component{
       clsPrefix, columns, record, height, visible, index,
       expandIconColumnIndex, expandIconAsCell, expanded, expandRowByClick,rowDraggAble,
       expandable, onExpand, needIndentSpaced, indent, indentSize,isHiddenExpandIcon,fixed,bodyDisplayInRow
-      ,expandedIcon,collapsedIcon, hoverKey,lazyStartIndex,lazyEndIndex
+      ,expandedIcon,collapsedIcon, hoverKey,lazyStartIndex,lazyEndIndex, style:propsStyle
     } = this.props;
     let showSum = false;
     let { className } = this.props;
@@ -513,7 +519,7 @@ class TableRow extends Component{
         />
       );
     }
-    const style = { height ,...record?record.style:undefined};
+    const style = { height , ...propsStyle, ...record?record.style:undefined};
     if (!visible) {
       style.display = 'none';
     }
