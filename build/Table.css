@@ -896,3 +896,6 @@
   line-height: 30px; }
   .u-dropdown ul.u-table-inline-op-dropdowm li.u-dropdown-menu-item i.uf {
     font-size: 12px; }
+
+.u-table-invalid-row td {
+  visibility: hidden; }

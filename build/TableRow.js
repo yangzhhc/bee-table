@@ -288,6 +288,8 @@ var TableRow = function (_Component) {
     };
 
     _this.onDragEnter = function (e) {
+      var onDragRowEnter = _this.props.onDragRowEnter;
+
       var event = _utils.Event.getEvent(e),
           _target = _utils.Event.getTarget(event),
           target = _target.parentNode;
@@ -295,12 +297,13 @@ var TableRow = function (_Component) {
       if (!currentIndex || currentIndex === _this.currentIndex) return;
       if (target.nodeName.toUpperCase() === "TR") {
         _this.synchronizeTableTr(currentIndex, true);
-        // target.setAttribute("style","border-bottom:2px dashed rgba(5,0,0,0.25)");
-        // // target.style.backgroundColor = 'rgb(235, 236, 240)';
+        onDragRowEnter && onDragRowEnter(currentIndex);
       }
     };
 
     _this.onDragLeave = function (e) {
+      var onDragRowLeave = _this.props.onDragRowLeave;
+
       var event = _utils.Event.getEvent(e),
           _target = _utils.Event.getTarget(event),
           target = _target.parentNode;
@@ -308,6 +311,7 @@ var TableRow = function (_Component) {
       if (!currentIndex || currentIndex === _this.currentIndex) return;
       if (target.nodeName.toUpperCase() === "TR") {
         _this.synchronizeTableTr(currentIndex, null);
+        onDragRowLeave && onDragRowLeave(currentIndex);
       }
     };
 
@@ -347,8 +351,7 @@ var TableRow = function (_Component) {
     var _props = this.props,
         store = _props.store,
         hoverKey = _props.hoverKey,
-        treeType = _props.treeType,
-        rowDraggAble = _props.rowDraggAble;
+        treeType = _props.treeType;
 
     this.unsubscribe = store.subscribe(function () {
       if (store.getState().currentHoverKey === hoverKey) {
@@ -571,7 +574,8 @@ var TableRow = function (_Component) {
         collapsedIcon = _props9.collapsedIcon,
         hoverKey = _props9.hoverKey,
         lazyStartIndex = _props9.lazyStartIndex,
-        lazyEndIndex = _props9.lazyEndIndex;
+        lazyEndIndex = _props9.lazyEndIndex,
+        propsStyle = _props9.style;
 
     var showSum = false;
     var className = this.props.className;
@@ -631,7 +635,7 @@ var TableRow = function (_Component) {
         lazyEndIndex: lazyEndIndex
       }));
     }
-    var style = _extends({ height: height }, record ? record.style : undefined);
+    var style = _extends({ height: height }, propsStyle, record ? record.style : undefined);
     if (!visible) {
       style.display = 'none';
     }

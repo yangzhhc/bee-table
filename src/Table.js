@@ -648,17 +648,14 @@ class Table extends Component {
     currentIndex = tableRowsMap && tableRowsMap["currentIndex"];
     targetIndex = tableRowsMap && tableRowsMap[targetKey] && tableRowsMap[targetKey]['index'];
     invalidRowIndex = tableRowsMap && tableRowsMap[invalidRowId] && tableRowsMap[invalidRowId]['index'];
-    console.log('增', "targetIndex+1 : ", targetIndex+1, invalidRowIndex);
 
     // 如果已存在空行，需要先把空行删掉
-    if(invalidRowIndex && currentIndex > targetIndex){
+    if(invalidRowIndex && invalidRowIndex > -1){
       data.splice(invalidRowIndex, 1);
     }
-    if(currentIndex !== targetIndex + 1){
-      data.splice(parseInt(targetIndex) + 1, 0, { key: invalidRowId });
-      invalidRowInfo[invalidRowId] = { index:parseInt(targetIndex) + 1, record:{ key: invalidRowId } };
-      this.tableRowsMap = Object.assign(tableRowsMap, invalidRowInfo);
-    }
+    data.splice(parseInt(targetIndex) + 1, 0, { key: invalidRowId }); //加空行
+    invalidRowInfo[invalidRowId] = { index:parseInt(targetIndex) + 1, record:{ key: invalidRowId } };
+    this.tableRowsMap = Object.assign(tableRowsMap, invalidRowInfo);
     this.setState({
       data
     });
@@ -675,10 +672,9 @@ class Table extends Component {
 
     currentIndex = tableRowsMap && tableRowsMap["currentIndex"];
     invalidRowIndex = tableRowsMap && tableRowsMap[invalidRowId] && tableRowsMap[invalidRowId]['index'];
-    // console.log('删', "invalidRowIndex : ", invalidRowIndex, tableRowsMap);
 
     if(currentIndex !== invalidRowIndex){
-      data.splice(invalidRowIndex, 1);
+      data.splice(invalidRowIndex, 1); //删空行
       delete this.tableRowsMap[invalidRowId];
       this.setState({
         data
@@ -700,10 +696,13 @@ class Table extends Component {
     record = tableRowsMap && tableRowsMap[currentKey] && tableRowsMap[currentKey]['record'];
     currentIndex = tableRowsMap && tableRowsMap[currentKey] && tableRowsMap[currentKey]['index'];
     targetIndex = tableRowsMap && tableRowsMap[targetKey] && tableRowsMap[targetKey]['index'];
-    invalidRowIndex = tableRowsMap && tableRowsMap[invalidRowId] && tableRowsMap[invalidRowId]['index'];
-    // console.log('离开时删', "invalidRowIndex : ", invalidRowIndex, tableRowsMap);
-    
-    data.splice(invalidRowIndex, 1);
+    invalidRowIndex = tableRowsMap && tableRowsMap[invalidRowId] && tableRowsMap[invalidRowId]['index']
+
+    // 如果存在空行，需要把空行清空
+    if(invalidRowIndex && invalidRowIndex > -1){
+      data.splice(invalidRowIndex, 1);
+      delete this.tableRowsMap[invalidRowId];
+    }
     // data.forEach((da,i)=>{
     //   // tr 的唯一标识通过 data.key 或 rowKey 两种方式传进来
     //   let trKey = da.key ? da.key : this.getRowKey(da, i);

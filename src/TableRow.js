@@ -67,7 +67,7 @@ class TableRow extends Component{
 
 
   componentDidMount() {
-    const { store, hoverKey,treeType,rowDraggAble } = this.props;
+    const { store, hoverKey,treeType } = this.props;
     this.unsubscribe = store.subscribe(() => {
       if (store.getState().currentHoverKey === hoverKey) {
         this.setState({ hovered: true });
@@ -331,7 +331,6 @@ class TableRow extends Component{
         let currentIndex = target.getAttribute("data-row-key");
     if(!currentIndex || currentIndex === this.currentIndex)return;
     if(target.nodeName.toUpperCase() === "TR"){
-      console.log('enter', currentIndex)
       this.synchronizeTableTr(currentIndex,true);
       onDragRowEnter && onDragRowEnter(currentIndex);
     }
@@ -345,7 +344,6 @@ class TableRow extends Component{
         let currentIndex = target.getAttribute("data-row-key");
     if(!currentIndex || currentIndex === this.currentIndex)return;
     if(target.nodeName.toUpperCase() === "TR"){
-      console.log('leave', currentIndex)
       this.synchronizeTableTr(currentIndex,null);
       onDragRowLeave && onDragRowLeave(currentIndex);
     }
